@@ -1,20 +1,24 @@
 import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
-import { SignupDTO } from './auth.dto';
+import { SignInDTO, SignUpDTO } from './auth.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
+@ApiTags('Authentication')
 export class AuthController {
     constructor(private authService: AuthService) {}
 
     @UseGuards(LocalAuthGuard)
-    @Post('auth/login')
-    async login(@Request() req: Express.Request) {
+    @ApiOperation({ summary: 'Login using email and password' })
+    @Post('login')
+    async login(@Request() req: Express.Request, @Body() body: SignInDTO) {
         return this.authService.signIn(req.user!);
     }
 
-    @Post('auth/signup')
-    async signup(@Body() body: SignupDTO) {
+    @ApiOperation({ summary: 'Sign up to marketplace' })
+    @Post('signup')
+    async signup(@Body() body: SignUpDTO) {
         return this.authService.signUp(body);
     }
 }

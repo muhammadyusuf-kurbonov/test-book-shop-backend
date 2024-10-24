@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User as UserEntity } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
-import { SignupDTO } from './auth.dto';
+import { SignUpDTO } from './auth.dto';
 
 declare global {
     namespace Express {
@@ -26,8 +26,10 @@ export class AuthService {
         };
     }
 
-    async signUp(payload: SignupDTO) {
+    async signUp(payload: SignUpDTO) {
         const user = await this.usersService.create(payload);
+        // @ts-expect-error
+        delete user.password;
         return user;
     }
 }
