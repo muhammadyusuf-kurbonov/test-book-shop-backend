@@ -12,7 +12,7 @@ jobs:
         image: postgres:17
         # Provide the password for postgres
         env:
-          POSTGRES_PASSWORD: aaDai8te
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
           POSTGRES_USER: bookshop_user
           POSTGRES_DB: bookshop_test_db
         # Set health checks to wait until postgres has started
@@ -33,7 +33,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Deploy prisma schema
-        run: yarn prisma push --force-reset
+        run: yarn prisma db push --force-reset
 
       - name: Run tests
         run: yarn test
