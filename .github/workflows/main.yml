@@ -10,6 +10,9 @@ jobs:
       postgres:
         # Docker Hub image
         image: postgres:17
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
         # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
@@ -22,7 +25,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     env:
-      DATABASE_URL: "postgresql://bookshop_user:${{secrets.DB_PASSWORD}}@postgres:5432/bookshop_test_db?schema=public"
+      DATABASE_URL: "postgresql://bookshop_user:${{secrets.DB_PASSWORD}}@localhost:5432/bookshop_test_db?schema=public"
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
