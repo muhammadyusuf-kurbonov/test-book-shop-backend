@@ -1,0 +1,40 @@
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:17
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: aaDai8te
+          POSTGRES_USER: bookshop_user
+          POSTGRES_DB: bookshop_test_db
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Yarn Setup
+        uses: DerYeger/yarn-setup-action@v1.0.1
+
+      - name: Yarn install
+        run: yarn install --frozen-lockfile
+
+      - name: Deploy prisma schema
+        run: yarn prisma push --force-reset
+
+      - name: Run tests
+        run: yarn test
+      
