@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Request, Response, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { SignInDTO, SignUpDTO } from './auth.dto';
@@ -13,12 +13,12 @@ export class AuthController {
     @ApiOperation({ summary: 'Login using email and password' })
     @Post('login')
     async login(@Request() req: Express.Request, @Body() body: SignInDTO) {
-        return this.authService.signIn(req.user!);
+        return await this.authService.signIn(req.user!);
     }
 
     @ApiOperation({ summary: 'Sign up to marketplace' })
     @Post('signup')
     async signup(@Body() body: SignUpDTO) {
-        return this.authService.signUp(body);
+        return await this.authService.signUp(body);
     }
 }

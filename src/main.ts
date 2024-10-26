@@ -6,8 +6,14 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  if (process.env.NODE_ENV === 'test') {
+    console.log('WARNING! Test env detected!');
+  }
+
   setupSwagger(app);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+  }));
 
   await app.listen(process.env.PORT ?? 3000);
 }

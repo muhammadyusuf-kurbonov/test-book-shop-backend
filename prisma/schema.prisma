@@ -27,7 +27,7 @@ model Book {
   title       String
   description String
   coverImage  String
-  price       String
+  price       Float
   authorId    String @db.Uuid()
   author      User   @relation(fields: [authorId], references: [id])
 }
