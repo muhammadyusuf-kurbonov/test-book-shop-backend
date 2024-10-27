@@ -1,18 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Book, User } from '@prisma/client';
+import { CreateBookDto } from 'src/book/book.dto';
+import { BookService } from 'src/book/book.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { UsersService } from 'src/users/users.service';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { SignUpDTO } from 'src/auth/auth.dto';
-import { Book, Prisma, PrismaClient, User } from '@prisma/client';
-import { UsersService } from 'src/users/users.service';
-import { CreateBookDto } from 'src/book/book.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { before } from 'node:test';
-import { BookService } from 'src/book/book.service';
 
 describe('Books (e2e)', () => {
     let app: INestApplication;
-    let token: string;
 
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -28,21 +25,12 @@ describe('Books (e2e)', () => {
         await app.init();
     });
 
-    afterEach(async () => {
-        const prisma = new PrismaClient();
-        await prisma.book.deleteMany();
-    });
-
     afterAll(async () => {
-        const prisma = new PrismaClient();
-        await prisma.user.deleteMany();
+        await app.close();
     });
 
     it('publish is protected', async () => {
-        await request(app.getHttpServer())
-            .post('/book')
-            .send()
-            .expect(401);
+        await request(app.getHttpServer()).post('/book').send().expect(401);
     });
 
     it('/book publish success (POST)', async () => {
@@ -52,12 +40,14 @@ describe('Books (e2e)', () => {
             password: 'test-pass',
             pseudonym: 'MsJ',
         });
+        await new Promise((resolve) => setTimeout(resolve, 100));
         const authResponse = await request(app.getHttpServer())
-            .post('/auth/login') // Ensure this matches your login route
-            .send({ email: 'publisher@bookshop.com', password: 'test-pass' }) // replace with test credentials
+            .post('/auth/login')
+            .send({ email: 'publisher@bookshop.com', password: 'test-pass' })
             .expect(201);
 
-        token = authResponse.body.access_token;
+        const token = authResponse.body.access_token;
+
         const response = await request(app.getHttpServer())
             .post('/book')
             .set('Authorization', `Bearer ${token}`)
@@ -92,7 +82,9 @@ describe('Books (e2e)', () => {
             ]);
             users = [user1, user2];
 
-            await app.get(PrismaService).book.createMany({
+            const prisma = app.get(PrismaService);
+            await prisma.book.deleteMany();
+            await prisma.book.createMany({
                 data: Array(5)
                     .fill(0)
                     .map((index) => ({
@@ -167,6 +159,7 @@ describe('Books (e2e)', () => {
             });
         });
         beforeEach(async () => {
+            await app.get(PrismaService).book.deleteMany();
             book = await app.get(PrismaService).book.create({
                 data: {
                     coverImage: 'https://images.google.com/any_img.jpeg',
