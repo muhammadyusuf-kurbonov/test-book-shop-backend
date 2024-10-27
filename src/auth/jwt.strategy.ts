@@ -17,7 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.prisma.user.findFirst({
       where: { id: payload.sub }
     });
-    console.log('auth: user', user);
     return user;
   }
 }
