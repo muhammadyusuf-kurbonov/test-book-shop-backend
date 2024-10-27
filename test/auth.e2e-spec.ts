@@ -23,12 +23,6 @@ describe('Auth (e2e)', () => {
         await app.init();
     });
 
-    afterEach(async () => {
-        const prisma = app.get(PrismaService);
-        await prisma.book.deleteMany();
-        await prisma.user.deleteMany();
-    })
-
     it('/signup success (POST)', () => {
         return request(app.getHttpServer())
             .post('/auth/signup')
