@@ -68,7 +68,7 @@ export class BookController {
 
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Update info of existing book' })
-    @ApiConsumes('multipart/form-data')
+    @ApiConsumes('multipart/form-data', 'application/json')
     @ApiBody({
         type: UpdateBookWithCoverImageDto,
     })
@@ -77,7 +77,7 @@ export class BookController {
     @UseInterceptors(FileInterceptor('coverImage'))
     update(
         @Param('id') id: string,
-        @Body() updateBookDto: UpdateBookDto,
+        @Body() updateBookDto: UpdateBookDto | UpdateBookWithCoverImageDto,
         @Request() req: Express.Request,
         @UploadedFile() coverImage?: Express.Multer.File,
     ) {
